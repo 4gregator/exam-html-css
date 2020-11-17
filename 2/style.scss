@@ -1,0 +1,89 @@
+%arrow {
+  position: absolute;
+  top: calc(50% - 17px);
+  width: 32px;
+  height: 34px;
+  background-color: yellow !important;
+  margin: 0 !important;
+}
+%arrow-pseudo {
+  position: absolute;
+  left: 15px;
+  content: ' ';
+  height: 15px;
+  width: 2px;
+  background-color: grey;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  list-style-type: none;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  color: inherit;
+  border: none;
+}
+
+:active, :hover, :focus {
+  outline: 0;
+  outline-offset: 0;
+}
+
+.main {
+  padding: 80px 0;
+
+  &__title {
+    margin-bottom: 40px;
+  }
+}
+
+.container {
+  max-width: 960px;
+  margin: auto;
+  padding: 0 60px;
+}
+
+.title {
+  text-align: center;
+}
+
+.item {
+  height: 200px;
+  background-color: gray;
+}
+
+.owl-prev {
+  @extend %arrow;
+  left: 0;
+
+  &:before {
+    @extend %arrow-pseudo;
+    transform: rotate(45deg);
+    top: 5px;
+  }
+
+  &:after {
+    @extend %arrow-pseudo;
+    transform: rotate(-45deg);
+    top: 15px;
+  }
+}
+
+.owl-next {
+  @extend %arrow;
+  right: 0;
+
+  &:before {
+    @extend %arrow-pseudo;
+    transform: rotate(45deg);
+    top: 15px;
+  }
+
+  &:after {
+    @extend %arrow-pseudo;
+    transform: rotate(-45deg);
+    top: 5px;
+  }
+}
