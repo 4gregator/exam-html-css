@@ -30,26 +30,17 @@
 .main__title {
   margin-bottom: 40px;
 }
+.main__wrapper-expand {
+  padding: 0 10px;
+}
+.main__expand:not(:first-child) {
+  margin-top: 25px;
+}
 
-.smooth-scroll {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+.expand__title {
+  margin-bottom: 10px;
+  cursor: pointer;
 }
-.smooth-scroll__item {
-  margin-bottom: 60px;
-  width: 23%;
-  height: 130px;
-  background-color: #000;
-  opacity: 0;
-  -webkit-transition-duration: 400ms;
-          transition-duration: 400ms;
-}
-.smooth-scroll__item_visible {
-  opacity: 1;
+.expand__text {
+  display: none;
 }

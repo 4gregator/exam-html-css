@@ -30,23 +30,26 @@
   &__title {
     margin-bottom: 40px;
   }
+
+  &__wrapper-expand {
+    padding: 0 10px;
+  }
+
+  &__expand:not(:first-child) {
+    margin-top: 25px;
+  }
 }
 
-.smooth-scroll {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+.expand {
+  &__title {
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  &__text {
+    display: none;
 
-  &__item {
-    margin-bottom: 60px;
-    width: 23%;
-    height: 130px;
-    background-color: #000;
-    opacity: 0;
-    transition-duration: 400ms;
-
-    &_visible {
-      opacity: 1;
-    }
+    // &_visible {
+    //   display: block;
+    // }
   }
 }
