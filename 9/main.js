@@ -11,7 +11,7 @@ function sumUpDiagonals(matrix) {
   let scnd = 0;
 
   matrix.forEach( (el, ind) => {
-    console.log(el, ind);
+    console.log(el);
     main += el[ind];
     scnd += el[leng - ind];
   });
