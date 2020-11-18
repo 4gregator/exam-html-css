@@ -1,6 +1,6 @@
 <?php
 $name = inputFilter($_POST['name']);
-$namePattern = '/^[a-zA-Zа-яёА-ЯЁ\s]+$/';
+$namePattern = '/^[a-zA-Zа-яёА-ЯЁ\s]+$/u';
 $tel = inputFilter($_POST['phone']);
 $telPattern = '/[+\(\)\-\s\d]/';
 $mail = inputFilter($_POST['email']);
