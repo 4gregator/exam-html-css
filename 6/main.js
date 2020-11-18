@@ -1,8 +1,8 @@
-document.addEventListener( 'DOMContentLoaded', smooth.bind(this, 'smooth-scroll__item', 0) );
-window.addEventListener( 'scroll', smooth.bind(this, 'smooth-scroll__item', 300) );
+document.addEventListener( 'DOMContentLoaded', smoothEmerging.bind(this, 'smooth-scroll__item', 0) );
+window.addEventListener( 'scroll', smoothEmerging.bind(this, 'smooth-scroll__item', 300) );
 
 
-function smooth(clas, timeout) {
+function smoothEmerging(clas, timeout) {
   const scroll = window.pageYOffset + window.innerHeight;
   const elems = document.getElementsByClassName(clas);
   const visible = clas + '_visible';
