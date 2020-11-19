@@ -1,8 +1,8 @@
 const popupConfig = {
-  // класс попап окон
+  // имя класса попап окон
   popupClassName: 'popup',
-  // постфикс видимого попапа
-  popupActivePostfix: '_visible'
+  // имя класса видимого попапа
+  popupActiveName: 'popup_visible'
 };
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
   Array.prototype.forEach.call(closeElements, function (el) {
 
     el.addEventListener('click', function () {
-      let activePopup = document.querySelector('.' + popupConfig.popupClassName + popupConfig.popupActivePostfix);
+      let activePopup = document.querySelector('.' + popupConfig.popupActiveName);
 
       popupHide.call(activePopup);
     });
@@ -51,40 +51,36 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // отправка формы
+  const urlForm = 
   $('.popup__form').on('submit', function(e) {
     e.preventDefault();
-    
-    const form = $(e.target);
-    const formData = {};
+
+    const form = $(this);
+    const formData = form.serialize();
     const preloader = $('.popup__preloader');
     const answerError = $('.popup__error');
-
-    $(form).find('.popup__input').each(function() {
-      formData[this.name] = $(this).val();
-    });
     
+    form.hide();
+    answerError.hide();
+    preloader.show();      
 
-    if (form[0].reportValidity()) {
-      form.hide();
-      answerError.hide();
-      preloader.show();      
-
-      $.post('/src/form.php', formData, function(answer) {
-        // успех        
-        if (answer.result == 'success') {
-          popupHide.call(popupForm);
-          popupShow.call(popupAnswer);
-        }
-        //ошибка
-        if (answer.result == 'error') {
-          let errorText = 'Ошибка:<br>' + answer.status;
-          answerError.html(errorText);
-          preloader.hide();
-          form.show();
-          answerError.show();
-        }
-      }, 'json');
-    }
+    $.post('/src/form.php', formData, function(answer) {
+      // успех        
+      if (answer.result == 'success') {
+        popupHide.call(popupForm);
+        popupShow.call(popupAnswer);
+        pushElement.removeEventListener('click', popupShow.bind(popupForm));
+        pushElement.addEventListener('click', popupShow.bind(popupAnswer));
+      }
+      //ошибка
+      if (answer.result == 'error') {
+        let errorText = 'Ошибка:\r\n' + answer.status;
+        answerError.html(errorText);
+        preloader.hide();
+        form.show();
+        answerError.show();
+      }
+    }, 'json');
   });
 
   // появление эелементов с плавной загрузкой видимые при открытии страницы
@@ -98,33 +94,16 @@ document.addEventListener('DOMContentLoaded', function () {
   $('.js-expand__title').on('click', function () {
     expandElement.call(this, 'js-expand__text', 'js-expand__text_visible');
   });
-
-  /* функция раскрывающихся списков */
-  // target = имя класса скрываемого/показываемого контента
-  // visible = имя класса видимого объекта
-  // duration = скорость анимации слайда в мс (по дефолту 400)
-  // в this должен передаваться элемент, по которому произведён клик
-  function expandElement(target, visible, duration = 400) {
-    const targetClass = '.' + target;
-    const visibleClass = '.' + visible;
-    const expandingElement = $(this).parent().find(targetClass);
-    const targetSelf = expandingElement.hasClass(visibleName) ? true : false;
-  
-    $(visibleClass).slideUp(duration).removeClass(visibleName);
-    if (!targetSelf) {
-      expandingElement.slideDown(duration).addClass(visibleName);
-    }
-  }
 });
 
 /* функции вызова и скрытия popup */
 // в контексте объект попап окна
 function popupShow() {
-  this.classList.add(popupConfig.popupClassName + popupConfig.popupActivePostfix);
+  this.classList.add(popupConfig.popupActiveName);
 }
 
 function popupHide() {
-  this.classList.remove(popupConfig.popupClassName + popupConfig.popupActivePostfix);
+  this.classList.remove(popupConfig.popupActiveName);
 }
 
 /* функиця плавной загрузки элементов */
@@ -156,6 +135,26 @@ function isVisible(element) {
   }
 
   return window.pageYOffset + window.innerHeight > offset;
+}
+
+/* функция раскрывающихся списков */
+// target = имя класса скрываемого/показываемого контента
+// visible = имя класса раскрытого элемента
+// duration = скорость анимации слайда в мс (по дефолту 400)
+// в this должен передаваться элемент, по которому произведён клик
+function expandElement(target, visible, duration = 400) {
+  const targetClass = '.' + target;
+  const visibleClass = '.' + visible;
+  const elemID = $(this).attr('data-expand-id');
+  const expandingElement = $(targetClass + '[data-expand-id="' + elemID + '"]');
+  const targetSelf = ( $(this).attr('data-expanded') === 'true' ) ? true : false;
+
+  $(visibleClass).slideUp(duration).removeClass(visible);
+  $('[data-expanded="true"').attr('data-expanded', 'false');
+  if (!targetSelf) {
+    expandingElement.slideDown(duration).addClass(visible);
+    $(this).attr('data-expanded', 'true');
+  }
 }
 
 // ЗАДАНИЕ №9

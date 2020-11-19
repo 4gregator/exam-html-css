@@ -12,9 +12,9 @@ if (preg_match($namePattern, $name) && preg_match($telPattern, $tel) && preg_mat
 } else {
   $result = "error";
   $status = '';
-  if (!preg_match($namePattern, $name)) $status .= 'Проверьте Ваше имя<br>';
-  if (!preg_match($telPattern, $tel)) $status .= 'Проверьте Ваш телефон<br>';
-  if (!preg_match($mailPattern, $mail)) $status .= 'Проверьте Вашу почту<br>';
+  if (!preg_match($namePattern, $name)) $status .= 'Проверьте Ваше имя' . PHP_EOL;
+  if (!preg_match($telPattern, $tel)) $status .= 'Проверьте Ваш телефон' . PHP_EOL;
+  if (!preg_match($mailPattern, $mail)) $status .= 'Проверьте Вашу почту' . PHP_EOL;
 }
 echo json_encode(["result" => $result, "status" => $status]);
 
