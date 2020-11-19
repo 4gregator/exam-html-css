@@ -1,9 +1,22 @@
-document.addEventListener('DOMContentLoaded', function () {
-  /* элементы popup */
-  const pushElem = document.getElementsByClassName('push')[0];// кнопка вызова
-  const closeElem = document.getElementsByClassName('popup__close')[0];// кнопка закрытия
-  const popupElem = document.getElementsByClassName('popup')[0];// сам popup
+const popupConfig = {
+  // класс попап окон
+  popupClassName: 'popup',
+  // постфикс видимого попапа
+  popupActivePostfix: '_visible'
+};
 
+document.addEventListener('DOMContentLoaded', function () {
+/* элементы popup */
+  // кнопка вызова формы
+  const pushElement = document.querySelector('.js-open-form');
+  // коллекция кнопок закрытия popup
+  const closeElements = document.querySelectorAll('.js-close-popup');
+  // коллекция попап окон
+  const popupBlocks = document.querySelectorAll('.' + popupConfig.popupClassName);
+  // popup с формой
+  const popupForm = document.querySelector('.js-show-form');
+  // popup успешного ответа на форму
+  const popupAnswer = document.querySelector('.js-show-answer');
 
   // каруселька
   $('.owl-carousel').owlCarousel({
@@ -16,11 +29,25 @@ document.addEventListener('DOMContentLoaded', function () {
     dots: false
   });
 
-  // popup
-  pushElem.addEventListener('click', popupShow.bind(this, 'popup'));
-  closeElem.addEventListener('click', popupHide.bind(this, 'popup'));
-  popupElem.addEventListener('click', function(e) {
-    if (e.target === popupElem) popupHide('popup');
+  // открыть попап с формой
+  pushElement.addEventListener('click', popupShow.bind(popupForm));
+
+  // закрыть попап по кнопке
+  Array.prototype.forEach.call(closeElements, function (el) {
+
+    el.addEventListener('click', function () {
+      let activePopup = document.querySelector('.' + popupConfig.popupClassName + popupConfig.popupActivePostfix);
+
+      popupHide.call(activePopup);
+    });
+  });
+
+  // закрытие попапа по клику вне контента окна
+  Array.prototype.forEach.call(popupBlocks, function (el) {
+
+    el.addEventListener('click', function (e) {
+      if (e.target === this) popupHide.call(el);
+    });
   });
 
   // отправка формы
@@ -30,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = $(e.target);
     const formData = {};
     const preloader = $('.popup__preloader');
-    const answerSuccess = $('.popup__success');
     const answerError = $('.popup__error');
 
     $(form).find('.popup__input').each(function() {
@@ -46,8 +72,8 @@ document.addEventListener('DOMContentLoaded', function () {
       $.post('/src/form.php', formData, function(answer) {
         // успех        
         if (answer.result == 'success') {
-          preloader.hide();
-          answerSuccess.show();
+          popupHide.call(popupForm);
+          popupShow.call(popupAnswer);
         }
         //ошибка
         if (answer.result == 'error') {
@@ -62,66 +88,74 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // появление эелементов с плавной загрузкой видимые при открытии страницы
-  smoothLoading('smooth-scroll__item');
+  smoothLoading('js-smooth-scroll__item', 'js-smooth-scroll__item_visible');
   // плавная загрузка для оставшихся элементов
-  window.addEventListener('scroll', smoothLoading.bind(this, 'smooth-scroll__item', 300));
+  window.addEventListener('scroll', function () {
+    smoothLoading('js-smooth-scroll__item', 'js-smooth-scroll__item_visible', 300)
+  });
   
   // раскрывающиеся списки
-  $('.expand__title').on('click', function () {
-    expandElement.call(this, 'expand__text');
+  $('.js-expand__title').on('click', function () {
+    expandElement.call(this, 'js-expand__text', 'js-expand__text_visible');
   });
+
+  /* функция раскрывающихся списков */
+  // target = имя класса скрываемого/показываемого контента
+  // visible = имя класса видимого объекта
+  // duration = скорость анимации слайда в мс (по дефолту 400)
+  // в this должен передаваться элемент, по которому произведён клик
+  function expandElement(target, visible, duration = 400) {
+    const targetClass = '.' + target;
+    const visibleClass = '.' + visible;
+    const expandingElement = $(this).parent().find(targetClass);
+    const targetSelf = expandingElement.hasClass(visibleName) ? true : false;
+  
+    $(visibleClass).slideUp(duration).removeClass(visibleName);
+    if (!targetSelf) {
+      expandingElement.slideDown(duration).addClass(visibleName);
+    }
+  }
 });
 
 /* функции вызова и скрытия popup */
-// className = имя класса popup контейнера
-function popupShow(className) {
-  const elem = document.getElementsByClassName(className)[0];
-  elem.classList.add(className + '_visible');
-}
-function popupHide(className) {
-  const elem = document.getElementsByClassName(className)[0];
-  elem.classList.remove(className + '_visible');
+// в контексте объект попап окна
+function popupShow() {
+  this.classList.add(popupConfig.popupClassName + popupConfig.popupActivePostfix);
 }
 
-function sendForm(e) {
-  e.preventDefault();
-  console.log(this);
+function popupHide() {
+  this.classList.remove(popupConfig.popupClassName + popupConfig.popupActivePostfix);
 }
 
 /* функиця плавной загрузки элементов */
 // className = имя класса для элемента с плавным появлением
+// classNameVisible = имя класса для видимого элемента
 // timeout = задержка перед появлением в мс (дефолтное 0)
-function smoothLoading(className, timeout = 0) {
-  const pageOffset = window.pageYOffset + window.innerHeight;
-  const smoothElements = document.getElementsByClassName(className);
-  const visible = className + '_visible';
+function smoothLoading(className, classNameVisible, timeout = 0) {
+  const smoothElements = document.querySelectorAll('.' + className);
 
   Array.prototype.forEach.call(smoothElements, function (el) {
-    let elemOffset = el.offsetTop;
 
-    if (!el.classList.contains(visible) && pageOffset > elemOffset) {
+    if (!el.classList.contains(classNameVisible) && isVisible(el)) {
       setTimeout(function() {
-        el.classList.add(visible);
+        el.classList.add(classNameVisible);
       }, timeout);
     }
   });
 }
 
-/* функция раскрывающихся списков */
-// target (string) = имя класса скрываемого/показываемого контента
-// duration (integer) = скорость анимации слайда в мс (по дефолту 400)
-// в this должен передаваться элемент, по которому произведён клик
-function expandElement(target, duration = 400) {
-  const targetClass = '.' + target;
-  const visibleName = target + '_visible';
-  const visibleClass = '.' + visibleName;
-  const expandingElement = $(this).parent().find(targetClass);
-  const targetSelf = expandingElement.hasClass(visibleName) ? true : false;
+/* проверка видимости элемента в окне браузера */
+// element = элемент, который надо проверить
+function isVisible(element) {
+  let offset = element.offsetTop;
+  let parent = element.offsetParent;
 
-  $(visibleClass).slideUp(duration).removeClass(visibleName);
-  if (!targetSelf) {
-    expandingElement.slideDown(duration).addClass(visibleName);
+  while (parent) {
+    offset += parent.offsetTop;
+    parent = parent.offsetParent;
   }
+
+  return window.pageYOffset + window.innerHeight > offset;
 }
 
 // ЗАДАНИЕ №9

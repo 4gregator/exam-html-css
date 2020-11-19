@@ -31,10 +31,9 @@
   padding: 0;
   text-decoration: none;
   list-style-type: none;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   color: inherit;
-  border: none;
+  border: 0;
 }
 
 :active, :hover, :focus {
@@ -53,17 +52,24 @@
     margin-bottom: 20px;
   }
 
+  &__push-me {
+    margin-bottom: 20px;
+    display: block;
+    padding: 4px;
+    cursor: pointer;
+    color: red;
+  }
+
   &__slider {
     margin-bottom: 80px;
   }
 
   &__wrapper-expand {
-    margin-top: 40px;
     padding: 0 10px;
   }
 
-  &__expand:not(:first-child) {
-    margin-top: 25px;
+  &__js-expand:not(:last-child) {
+    margin-bottom: 25px;
   }
 }
 
@@ -126,31 +132,6 @@
   }
 }
 
-.smooth-scroll {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-
-  &__item {
-    margin-bottom: 60px;
-    width: 23%;
-    height: 100px;
-    background-color: #000;
-    opacity: 0;
-    transition-duration: 400ms;
-
-    &_visible {
-      opacity: 1;
-    }
-  }
-}
-
-.push {
-  padding: 4px;
-  cursor: pointer;
-  color: red;
-}
-
 .popup {
   display: none;
   position: fixed;
@@ -177,8 +158,11 @@
     background-color: #fff;
   }
 
+  &__text {
+    margin-bottom: 13px;
+  }
+
   &__form {
-    margin-top: 40px;
     display: flex;
     justify-content: center;
   }
@@ -191,6 +175,12 @@
     background-color: #000;
   }
 
+  &__input-wrapper {
+    margin-bottom: 15px;
+    display: flex;
+    flex-flow: column;
+  }
+
   &__label {
     text-align: center;
     margin-bottom: 5px;
@@ -200,7 +190,6 @@
   &__input {
     padding: 4px 8px;
     border: 1px solid #fff;
-    margin-bottom: 15px;
   }
 
   &__label-checkbox {
@@ -238,7 +227,6 @@
   }
 
   &__submit {
-    margin-top: 10px;
     height: 30px;
     cursor: pointer;
   }
@@ -269,27 +257,43 @@
   }
 
   &__preloader {
-    margin-top: 20px;
     display: none;
     width: 300px;
   }
 
   &__success {
-    margin-top: 130px;
-    display: none;
     font-size: 20px;
     font-weight: bold;
     color: green;
   }
 
   &__error {
-    margin-top: 20px;
     display: none;
     color: red;
   }
 }
 
+.js-smooth-scroll {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  &__item {
+    margin-bottom: 60px;
+    width: 23%;
+    height: 100px;
+    background-color: #000;
+    opacity: 0;
+    transition-duration: 400ms;
+
+    &_visible {
+      opacity: 1;
+    }
+  }
+}
+
 table {
+  margin-bottom: 40px;
   width: 100%;
   border-collapse: collapse;
 }
@@ -298,6 +302,11 @@ thead {
   font-weight: bold;
   font-size: larger;
   border-bottom: 1px solid #000;
+}
+
+th {
+  text-align: left;
+  padding: 8px 13px;
 }
 
 td {
@@ -309,7 +318,7 @@ tbody tr:nth-child(2n) {
   background-color: #999;
 }
 
-.expand {
+.js-expand {
   &__title {
     margin-bottom: 10px;
     cursor: pointer;
