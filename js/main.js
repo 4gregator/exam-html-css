@@ -67,10 +67,10 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // появление эелементов с плавной загрузкой видимые при открытии страницы
-  smoothLoading('js-smooth-scroll__item', 'js-smooth-scroll__item_visible');
+  loadSmooth('js-smooth-scroll__item', 'js-smooth-scroll__item_visible');
   // плавная загрузка для оставшихся элементов
   window.addEventListener('scroll', function () {
-    smoothLoading('js-smooth-scroll__item', 'js-smooth-scroll__item_visible', 300)
+    loadSmooth('js-smooth-scroll__item', 'js-smooth-scroll__item_visible', 300)
   });
   
   // раскрывающиеся списки
@@ -147,7 +147,7 @@ function changePopup(newPopup, oldPopup = false) {
 // className = имя класса для элемента с плавным появлением
 // classNameVisible = имя класса для видимого элемента
 // timeout = задержка перед появлением в мс (дефолтное 0)
-function smoothLoading(className, classNameVisible, timeout = 0) {
+function loadSmooth(className, classNameVisible, timeout = 0) {
   const smoothElements = document.querySelectorAll('.' + className);
 
   Array.prototype.forEach.call(smoothElements, function (el) {
