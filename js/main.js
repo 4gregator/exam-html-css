@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // открыть попап с формой
-  changePopup.call(pushElement, false, popupForm);
+  changePopup.call(pushElement, popupForm);
   //pushElement.addEventListener('click', popupShow.bind(popupForm));
 
   // закрыть попап по кнопке
@@ -103,7 +103,7 @@ function submitForm(url, launcher, form, success, error, preloader = false) {
   // показываем прелоадер
   if (preloader) {
     popupShow.call(preloader);
-    changePopup.call(launcher, form, preloader);
+    changePopup.call(launcher, preloader, form);
   }
   // отправляем данные, ждём ответ
   // answer.result = 'success' || 'error'
@@ -115,7 +115,7 @@ function submitForm(url, launcher, form, success, error, preloader = false) {
     if (answer.result == 'success') {
       let popup = preloader ? preloader : form;
       popupShow.call(success);
-      changePopup.call(launcher, popup, success);
+      changePopup.call(launcher, success, popup);
     }
     if (answer.result == 'error') {
       popupShow.call(error);
@@ -126,12 +126,13 @@ function submitForm(url, launcher, form, success, error, preloader = false) {
     }
   }, 'json');
 }
+
 /* смена вызова попап окна по клику на элемент */
 // this = элемент, вызывающий попап
 // oldPopup = текущий попап
 // newPopup = активриуемый попап
-function changePopup(oldPopup, newPopup) {
-  this.removeEventListener('click', popupShow.bind(oldPopup));
+function changePopup(newPopup, oldPopup = false) {
+  if (oldPopup) this.removeEventListener('click', popupShow.bind(oldPopup));
   this.addEventListener('click', popupShow.bind(newPopup));
 }
 
