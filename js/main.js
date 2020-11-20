@@ -15,8 +15,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const popupBlocks = document.querySelectorAll('.' + popupConfig.popupClassName);
   // popup с формой
   const popupForm = document.querySelector('.js-show-form');
+  // popup с прелоадером
+  const popupPreloader = document.querySelector('.js-show-preloader');
   // popup успешного ответа на форму
   const popupAnswer = document.querySelector('.js-show-answer');
+  // popup ошибки ответа на форму
+  const popupError = document.querySelector('.js-show-error');
 
   // каруселька
   $('.owl-carousel').owlCarousel({
@@ -30,10 +34,11 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // открыть попап с формой
-  pushElement.addEventListener('click', popupShow.bind(popupForm));
+  changePopup.call(pushElement, false, popupForm);
+  //pushElement.addEventListener('click', popupShow.bind(popupForm));
 
   // закрыть попап по кнопке
-  Array.prototype.forEach.call(closeElements, function (el) {
+  Array.prototype.forEach.call(closeElements, function(el) {
 
     el.addEventListener('click', function () {
       let activePopup = document.querySelector('.' + popupConfig.popupActiveName);
@@ -43,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // закрытие попапа по клику вне контента окна
-  Array.prototype.forEach.call(popupBlocks, function (el) {
+  Array.prototype.forEach.call(popupBlocks, function(el) {
 
     el.addEventListener('click', function (e) {
       if (e.target === this) popupHide.call(el);
@@ -51,36 +56,12 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // отправка формы
-  const urlForm = 
-  $('.popup__form').on('submit', function(e) {
+  
+  $('.popup__form').on('submit', function (e) {
     e.preventDefault();
+    const urlForm = '/src/form.php';
 
-    const form = $(this);
-    const formData = form.serialize();
-    const preloader = $('.popup__preloader');
-    const answerError = $('.popup__error');
-    
-    form.hide();
-    answerError.hide();
-    preloader.show();      
-
-    $.post('/src/form.php', formData, function(answer) {
-      // успех        
-      if (answer.result == 'success') {
-        popupHide.call(popupForm);
-        popupShow.call(popupAnswer);
-        pushElement.removeEventListener('click', popupShow.bind(popupForm));
-        pushElement.addEventListener('click', popupShow.bind(popupAnswer));
-      }
-      //ошибка
-      if (answer.result == 'error') {
-        let errorText = 'Ошибка:\r\n' + answer.status;
-        answerError.html(errorText);
-        preloader.hide();
-        form.show();
-        answerError.show();
-      }
-    }, 'json');
+    submitForm.call(this, urlForm, pushElement, popupForm, popupAnswer, popupError, popupPreloader);
   });
 
   // появление эелементов с плавной загрузкой видимые при открытии страницы
@@ -104,6 +85,54 @@ function popupShow() {
 
 function popupHide() {
   this.classList.remove(popupConfig.popupActiveName);
+}
+
+/* функция обработки сабмита формы*/
+// контекст - сама форма
+// url = url post запроса
+// launcher = элемент, открывающий попап
+// form = попап с формой
+// success = попап с успешным ответом
+// error = попап с ошибкой
+// preloader = попап с прелоадером (необязательно)
+function submitForm(url, launcher, form, success, error, preloader = false) {  
+  const formData = $(this).serialize();
+
+  //пярчем форму
+  popupHide.call(form);
+  // показываем прелоадер
+  if (preloader) {
+    popupShow.call(preloader);
+    changePopup.call(launcher, form, preloader);
+  }
+  // отправляем данные, ждём ответ
+  // answer.result = 'success' || 'error'
+  // answer.status - данные по ошибке, если нет ошибки = 200
+  $.post(url, formData, function (answer) {
+    // убираем прелоадер
+    if (preloader) popupHide.call(preloader);
+    // обрабатываем ответ
+    if (answer.result == 'success') {
+      let popup = preloader ? preloader : form;
+      popupShow.call(success);
+      changePopup.call(launcher, popup, success);
+    }
+    if (answer.result == 'error') {
+      popupShow.call(error);
+      setTimeout(function () {
+        popupHide.call(error);
+        popupShow.call(form);
+      }, 2500);
+    }
+  }, 'json');
+}
+/* смена вызова попап окна по клику на элемент */
+// this = элемент, вызывающий попап
+// oldPopup = текущий попап
+// newPopup = активриуемый попап
+function changePopup(oldPopup, newPopup) {
+  this.removeEventListener('click', popupShow.bind(oldPopup));
+  this.addEventListener('click', popupShow.bind(newPopup));
 }
 
 /* функиця плавной загрузки элементов */

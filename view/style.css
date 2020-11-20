@@ -258,7 +258,6 @@
           transform: rotate(-45deg);
 }
 .popup__preloader {
-  display: none;
   width: 300px;
 }
 .popup__success {
@@ -267,7 +266,6 @@
   color: green;
 }
 .popup__error {
-  display: none;
   color: red;
 }
 
