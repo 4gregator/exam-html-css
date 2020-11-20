@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
     el.addEventListener('click', function () {
       let activePopup = document.querySelector('.' + popupConfig.popupActiveName);
 
-      popupHide.call(activePopup);
+      hidePopup.call(activePopup);
     });
   });
 
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
   Array.prototype.forEach.call(popupBlocks, function(el) {
 
     el.addEventListener('click', function (e) {
-      if (e.target === this) popupHide.call(el);
+      if (e.target === this) hidePopup.call(el);
     });
   });
 
@@ -81,11 +81,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /* функции вызова и скрытия popup */
 // в контексте объект попап окна
-function popupShow() {
+function showPopup() {
   this.classList.add(popupConfig.popupActiveName);
 }
 
-function popupHide() {
+function hidePopup() {
   this.classList.remove(popupConfig.popupActiveName);
 }
 
@@ -101,10 +101,10 @@ function submitForm(url, launcher, form, success, error, preloader = false) {
   const formData = $(this).serialize();
 
   //пярчем форму
-  popupHide.call(form);
+  hidePopup.call(form);
   // показываем прелоадер
   if (preloader) {
-    popupShow.call(preloader);
+    showPopup.call(preloader);
     changePopup.call(launcher, preloader, form);
   }
   // отправляем данные, ждём ответ
@@ -112,18 +112,18 @@ function submitForm(url, launcher, form, success, error, preloader = false) {
   // answer.status - данные по ошибке, если нет ошибки = 200
   $.post(url, formData, function (answer) {
     // убираем прелоадер
-    if (preloader) popupHide.call(preloader);
+    if (preloader) hidePopup.call(preloader);
     // обрабатываем ответ
     if (answer.result == 'success') {
       let popup = preloader ? preloader : form;
-      popupShow.call(success);
+      showPopup.call(success);
       changePopup.call(launcher, success, popup);
     }
     if (answer.result == 'error') {
-      popupShow.call(error);
+      showPopup.call(error);
       setTimeout(function () {
-        popupHide.call(error);
-        popupShow.call(form);
+        hidePopup.call(error);
+        showPopup.call(form);
       }, 2500);
     }
   }, 'json');
@@ -137,10 +137,10 @@ function changePopup(newPopup, oldPopup = false) {
   if (oldPopup) {
     this.removeEventListener('click', initFormPopup.hideHadler);
   }
-  initFormPopup.hideHadler = popupShow.bind(newPopup);
+  initFormPopup.hideHadler = showPopup.bind(newPopup);
   this.addEventListener('click', initFormPopup.hideHadler);
-  // if (oldPopup) this.removeEventListener('click', popupShow.bind(oldPopup));
-  // this.addEventListener('click', popupShow.bind(newPopup));
+  // if (oldPopup) this.removeEventListener('click', showPopup.bind(oldPopup));
+  // this.addEventListener('click', showPopup.bind(newPopup));
 }
 
 /* функиця плавной загрузки элементов */
