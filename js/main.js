@@ -5,10 +5,13 @@ const popupConfig = {
   popupActiveName: 'popup_visible'
 };
 
+// объект для хранения данных кнопки вызова попап окна с формой
+let initFormPopup = {};
+
 document.addEventListener('DOMContentLoaded', function () {
 /* элементы popup */
   // кнопка вызова формы
-  const pushElement = document.querySelector('.js-open-form');
+  initFormPopup.element = document.querySelector('.js-open-form');
   // коллекция кнопок закрытия popup
   const closeElements = document.querySelectorAll('.js-close-popup');
   // коллекция попап окон
@@ -34,8 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // открыть попап с формой
-  changePopup.call(pushElement, popupForm);
-  //pushElement.addEventListener('click', popupShow.bind(popupForm));
+  changePopup.call(initFormPopup.element, popupForm);
 
   // закрыть попап по кнопке
   Array.prototype.forEach.call(closeElements, function(el) {
@@ -61,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
     e.preventDefault();
     const urlForm = '/src/form.php';
 
-    submitForm.call(this, urlForm, pushElement, popupForm, popupAnswer, popupError, popupPreloader);
+    submitForm.call(this, urlForm, initFormPopup.element, popupForm, popupAnswer, popupError, popupPreloader);
   });
 
   // появление эелементов с плавной загрузкой видимые при открытии страницы
@@ -132,8 +134,13 @@ function submitForm(url, launcher, form, success, error, preloader = false) {
 // oldPopup = текущий попап
 // newPopup = активриуемый попап
 function changePopup(newPopup, oldPopup = false) {
-  if (oldPopup) this.removeEventListener('click', popupShow.bind(oldPopup));
-  this.addEventListener('click', popupShow.bind(newPopup));
+  if (oldPopup) {
+    this.removeEventListener('click', initFormPopup.hideHadler);
+  }
+  initFormPopup.hideHadler = popupShow.bind(newPopup);
+  this.addEventListener('click', initFormPopup.hideHadler);
+  // if (oldPopup) this.removeEventListener('click', popupShow.bind(oldPopup));
+  // this.addEventListener('click', popupShow.bind(newPopup));
 }
 
 /* функиця плавной загрузки элементов */
