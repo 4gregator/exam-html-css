@@ -6,7 +6,10 @@ const popupConfig = {
 };
 
 // объект для хранения данных кнопки вызова попап окна с формой
-let initFormPopup = {};
+let initFormPopup = {
+  element: undefined,
+  hideHadler: undefined
+};
 
 document.addEventListener('DOMContentLoaded', function () {
 /* элементы popup */
@@ -36,8 +39,8 @@ document.addEventListener('DOMContentLoaded', function () {
     dots: false
   });
 
-  // открыть попап с формой
-  changePopup.call(initFormPopup.element, popupForm);
+  // добавляем ивент открытия попапа с формой
+  changePopup(initFormPopup, popupForm);
 
   // закрыть попап по кнопке
   Array.prototype.forEach.call(closeElements, function(el) {
@@ -58,12 +61,11 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // отправка формы
-  
   $('.popup__form').on('submit', function (e) {
     e.preventDefault();
     const urlForm = '/src/form.php';
 
-    submitForm.call(this, urlForm, initFormPopup.element, popupForm, popupAnswer, popupError, popupPreloader);
+    submitForm.call(this, urlForm, initFormPopup, popupForm, popupAnswer, popupError, popupPreloader);
   });
 
   // появление эелементов с плавной загрузкой видимые при открытии страницы
@@ -92,7 +94,7 @@ function hidePopup() {
 /* функция обработки сабмита формы*/
 // контекст - сама форма
 // url = url post запроса
-// launcher = элемент, открывающий попап
+// launcher = объект с данными элемента, открывающего попап
 // form = попап с формой
 // success = попап с успешным ответом
 // error = попап с ошибкой
@@ -105,7 +107,7 @@ function submitForm(url, launcher, form, success, error, preloader = false) {
   // показываем прелоадер
   if (preloader) {
     showPopup.call(preloader);
-    changePopup.call(launcher, preloader, form);
+    changePopup(launcher, preloader, form);
   }
   // отправляем данные, ждём ответ
   // answer.result = 'success' || 'error'
@@ -117,7 +119,7 @@ function submitForm(url, launcher, form, success, error, preloader = false) {
     if (answer.result == 'success') {
       let popup = preloader ? preloader : form;
       showPopup.call(success);
-      changePopup.call(launcher, success, popup);
+      changePopup(launcher, success, popup);
     }
     if (answer.result == 'error') {
       showPopup.call(error);
@@ -130,15 +132,15 @@ function submitForm(url, launcher, form, success, error, preloader = false) {
 }
 
 /* смена вызова попап окна по клику на элемент */
-// this = элемент, вызывающий попап
-// oldPopup = текущий попап
+// launcherData = объект для хранения данных кнопки вызова попап
 // newPopup = активриуемый попап
-function changePopup(newPopup, oldPopup = false) {
+// oldPopup = текущий попап
+function changePopup(launcherData, newPopup, oldPopup = false) {
   if (oldPopup) {
-    this.removeEventListener('click', initFormPopup.hideHadler);
+    launcherData.element.removeEventListener('click', launcherData.hideHadler);
   }
-  initFormPopup.hideHadler = showPopup.bind(newPopup);
-  this.addEventListener('click', initFormPopup.hideHadler);
+  launcherData.hideHadler = showPopup.bind(newPopup);
+  launcherData.element.addEventListener('click', launcherData.hideHadler);
   // if (oldPopup) this.removeEventListener('click', showPopup.bind(oldPopup));
   // this.addEventListener('click', showPopup.bind(newPopup));
 }
