@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const onError = function (status) {
       popupControl.show(popupError);
       setTimeout(function () {
-        showInputErrors.call(self, status, 'popup__input_error');
+        showInputErrors.call(self, status, 'popup__input_error', 'popup__error-msg');
         popupControl.show(popupForm);
       }, 1500);
     };
@@ -142,15 +142,19 @@ function submitForm(url, onSuccess, onError) {
 
 // контекст = форма
 // errors = массив имён инпутов с ошибкой
-// className = css класс ошибки инпута
-function showInputErrors(errors, className) {
+// className = имя класса ошибки инпута
+// errorClassName = имя класса с текстом ошибки
+function showInputErrors(errors, className, errorClassName) {
   let self = this;
   errors.forEach(function (name, index) {
     let input = $(self).find('[name="' + name + '"]');
+    let errorMsg = input.siblings('.' + errorClassName);
     
+    errorMsg.show();
     input.addClass(className)
       .on('keydown', function () {
         input.removeClass(className);
+        errorMsg.hide();
       });
   });
 }
