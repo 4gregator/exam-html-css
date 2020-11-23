@@ -118,14 +118,17 @@
           <div class="popup__input-wrapper">
             <label class="popup__label" for="name">Имя</label>
             <input class="popup__input" id="name" name="name" type="text" placeholder=" " required>
+            <span class="popup__error-msg">Проверьте корректность ввода данных</span>
           </div>
           <div class="popup__input-wrapper">
             <label class="popup__label" for="phone">Телефон</label>
             <input class="popup__input" id="phone" name="phone" type="tel" placeholder=" " pattern="^[0-9-+\s()]*$" minlength="11" required>
+            <span class="popup__error-msg">Проверьте корректность ввода данных</span>
           </div>
           <div class="popup__input-wrapper">
             <label class="popup__label" for="email">E-mail</label>
             <input class="popup__input" id="email" name="email" type="email" placeholder=" " pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required>
+            <span class="popup__error-msg">Проверьте корректность ввода данных</span>
           </div>
           <div class="popup__input-wrapper">
             <input class="popup__checkbox" id="policy" name="policy" type="checkbox" required>
@@ -151,7 +154,7 @@
   </div>
   <div class="popup js-show-error">
     <div class="popup__content">
-      <h2 class="popup__error">Произошла ошибка!</h2>
+      <h2 class="popup__error">Проверьте правильность заполнения формы</h2>
       <span class="popup__close js-close-popup"></span>
     </div>
   </div>

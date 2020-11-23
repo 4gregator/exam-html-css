@@ -7,16 +7,16 @@ $mail = inputFilter($_POST['email']);
 $mailPattern = '/.+@.+\..+/';
 
 if (preg_match($namePattern, $name) && preg_match($telPattern, $tel) && preg_match($mailPattern, $mail)) {
-  $result = "success";
+  $success = true;
   $status = 200;
 } else {
-  $result = "error";
-  $status = '';
-  if (!preg_match($namePattern, $name)) $status .= 'Проверьте Ваше имя' . PHP_EOL;
-  if (!preg_match($telPattern, $tel)) $status .= 'Проверьте Ваш телефон' . PHP_EOL;
-  if (!preg_match($mailPattern, $mail)) $status .= 'Проверьте Вашу почту' . PHP_EOL;
+  $success = false;
+  $status = [];
+  if (!preg_match($namePattern, $name)) $status []= 'name';
+  if (!preg_match($telPattern, $tel)) $status []= 'phone';
+  if (!preg_match($mailPattern, $mail)) $status []= 'email';
 }
-echo json_encode(["result" => $result, "status" => $status]);
+echo json_encode(["success" => $success, "status" => $status]);
 
 // фильтрация пользовательского ввода
 function inputFilter($input) {

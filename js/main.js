@@ -1,9 +1,26 @@
-const popupConfig = {
-  // имя класса попап окон
-  popupClassName: 'popup',
-  // имя класса видимого попапа
-  popupActiveName: 'popup_visible'
-};
+class PopupConfig {
+  constructor(className, classNameActive) {
+    // имя класса попап окон
+    this.className = className;
+    // имя класса видимого попапа
+    this.classNameActive = classNameActive;
+  }
+  
+  /* показать попап */
+  //popup = объект попап окна
+  show(popup) {
+    this.hide();
+    popup.classList.add(this.classNameActive);
+  }
+
+  /* закрыть открытый попап */
+  hide() {
+    const target = document.querySelector('.' + this.classNameActive);
+    if (target) target.classList.remove(this.classNameActive);
+  }
+}
+
+
 
 // объект для хранения данных кнопки вызова попап окна с формой
 let initFormPopup = {
@@ -11,14 +28,17 @@ let initFormPopup = {
   hideHadler: undefined
 };
 
+
 document.addEventListener('DOMContentLoaded', function () {
 /* элементы popup */
+  // инициализируем конфиг попап окон
+  const popupControl = new PopupConfig('popup', 'popup_visible');
   // кнопка вызова формы
   initFormPopup.element = document.querySelector('.js-open-form');
   // коллекция кнопок закрытия popup
   const closeElements = document.querySelectorAll('.js-close-popup');
   // коллекция попап окон
-  const popupBlocks = document.querySelectorAll('.' + popupConfig.popupClassName);
+  const popupBlocks = document.querySelectorAll('.' + popupControl.className);
   // popup с формой
   const popupForm = document.querySelector('.js-show-form');
   // popup с прелоадером
@@ -40,15 +60,20 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // добавляем ивент открытия попапа с формой
-  changePopup(initFormPopup, popupForm);
+  initFormPopup.element.addEventListener('click', function () {
+    popupControl.show(popupForm);
+  });
+  // changePopup(initFormPopup, popupForm);
+  // launcherData.hideHadler = showPopup.bind(newPopup);
+  // launcherData.element.addEventListener('click', launcherData.hideHadler);
 
   // закрыть попап по кнопке
   Array.prototype.forEach.call(closeElements, function(el) {
 
     el.addEventListener('click', function () {
-      let activePopup = document.querySelector('.' + popupConfig.popupActiveName);
+      let activePopup = document.querySelector('.' + popupControl.classNameActive);
 
-      hidePopup.call(activePopup);
+      popupControl.hide();
     });
   });
 
@@ -56,16 +81,29 @@ document.addEventListener('DOMContentLoaded', function () {
   Array.prototype.forEach.call(popupBlocks, function(el) {
 
     el.addEventListener('click', function (e) {
-      if (e.target === this) hidePopup.call(el);
+      if (e.target === this) popupControl.hide();
     });
   });
 
   // отправка формы
   $('.popup__form').on('submit', function (e) {
-    e.preventDefault();
     const urlForm = '/src/form.php';
+    const self = this;
+    const onSuccess = function () {
+      popupControl.show(popupAnswer);
+    };
+    const onError = function (status) {
+      popupControl.show(popupError);
+      setTimeout(function () {
+        showInputErrors.call(self, status, 'popup__input_error');
+        popupControl.show(popupForm);
+      }, 1500);
+    };
+    
+    e.preventDefault();
 
-    submitForm.call(this, urlForm, initFormPopup, popupForm, popupAnswer, popupError, popupPreloader);
+    popupControl.show(popupPreloader);
+    submitForm.call(this, urlForm, onSuccess, onError);
   });
 
   // появление эелементов с плавной загрузкой видимые при открытии страницы
@@ -81,69 +119,54 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-/* функции вызова и скрытия popup */
-// в контексте объект попап окна
-function showPopup() {
-  this.classList.add(popupConfig.popupActiveName);
-}
-
-function hidePopup() {
-  this.classList.remove(popupConfig.popupActiveName);
-}
-
 /* функция обработки сабмита формы*/
 // контекст - сама форма
 // url = url post запроса
-// launcher = объект с данными элемента, открывающего попап
-// form = попап с формой
-// success = попап с успешным ответом
-// error = попап с ошибкой
-// preloader = попап с прелоадером (необязательно)
-function submitForm(url, launcher, form, success, error, preloader = false) {  
+// onSuccess = функция обработки успешной отправки
+// onError = функция обработки ошибки отправки
+function submitForm(url, onSuccess, onError) {  
   const formData = $(this).serialize();
 
-  //пярчем форму
-  hidePopup.call(form);
-  // показываем прелоадер
-  if (preloader) {
-    showPopup.call(preloader);
-    changePopup(launcher, preloader, form);
-  }
   // отправляем данные, ждём ответ
-  // answer.result = 'success' || 'error'
+  // answer.success - ответ с сервера об успешности отправки формы true == success || false == error
   // answer.status - данные по ошибке, если нет ошибки = 200
   $.post(url, formData, function (answer) {
-    // убираем прелоадер
-    if (preloader) hidePopup.call(preloader);
     // обрабатываем ответ
-    if (answer.result == 'success') {
-      let popup = preloader ? preloader : form;
-      showPopup.call(success);
-      changePopup(launcher, success, popup);
-    }
-    if (answer.result == 'error') {
-      showPopup.call(error);
-      setTimeout(function () {
-        hidePopup.call(error);
-        showPopup.call(form);
-      }, 2500);
+    if (answer.success) {
+      onSuccess();
+    } else {
+      onError(answer.status);
     }
   }, 'json');
 }
 
-/* смена вызова попап окна по клику на элемент */
+// контекст = форма
+// errors = массив имён инпутов с ошибкой
+// className = css класс ошибки инпута
+function showInputErrors(errors, className) {
+  let self = this;
+  errors.forEach(function (name, index) {
+    let input = $(self).find('[name="' + name + '"]');
+    
+    input.addClass(className)
+      .on('keydown', function () {
+        input.removeClass(className);
+      });
+  });
+}
+
+/* меняем активное попап окно, вызываемое попап лаунчером */
 // launcherData = объект для хранения данных кнопки вызова попап
 // newPopup = активриуемый попап
 // oldPopup = текущий попап
-function changePopup(launcherData, newPopup, oldPopup = false) {
-  if (oldPopup) {
-    launcherData.element.removeEventListener('click', launcherData.hideHadler);
-  }
-  launcherData.hideHadler = showPopup.bind(newPopup);
-  launcherData.element.addEventListener('click', launcherData.hideHadler);
-  // if (oldPopup) this.removeEventListener('click', showPopup.bind(oldPopup));
-  // this.addEventListener('click', showPopup.bind(newPopup));
-}
+// function changePopup(launcherData, newPopup, oldPopup = false) {
+//   if (oldPopup) {
+//     launcherData.element.removeEventListener('click', launcherData.hideHadler);
+//   }
+//   //showPopup.bind
+//   launcherData.hideHadler = popupControl.show(newPopup);
+//   launcherData.element.addEventListener('click', launcherData.hideHadler);
+// }
 
 /* функиця плавной загрузки элементов */
 // className = имя класса для элемента с плавным появлением

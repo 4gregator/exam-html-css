@@ -190,6 +190,17 @@
   &__input {
     padding: 4px 8px;
     border: 1px solid #fff;
+
+    &_error {
+      color: red;
+      border-color: red;
+    }
+  }
+
+  &__error-msg {
+    display: none;
+    font-size: 12px;
+    color: red;
   }
 
   &__label-checkbox {
