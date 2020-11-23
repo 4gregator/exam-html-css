@@ -146,7 +146,7 @@ function submitForm(url, onSuccess, onError) {
 // errorClassName = имя класса с текстом ошибки
 function showInputErrors(errors, className, errorClassName) {
   let self = this;
-  errors.forEach(function (name, index) {
+  errors.forEach(function (name) {
     let input = $(self).find('[name="' + name + '"]');
     let errorMsg = input.siblings('.' + errorClassName);
     
